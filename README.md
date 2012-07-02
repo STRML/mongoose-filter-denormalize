@@ -12,7 +12,7 @@ Filtering functionality is provided via a schema plugin.
 
 ### Schema
 
-    var filter = require('mongoose-filter-plugin');
+    var filter = require('mongoose-filter-denormalize').filter;
     var ObjectId = mongoose.Schema.ObjectId;
     var UserSchema = new Mongoose.schema({
       name            :   String,
@@ -49,7 +49,7 @@ Filtering functionality is provided via a schema plugin.
     User.findById(req.params.id, function(err, user){
       if(err) next(err);
       if(user.id !== req.user.id) next(403);
-      user.extendWithWriteFilter(inputRecord, 'owner');  // Function added by plugin, similar to jQuery.extend()/Ext.extend()
+      user.extendWithWriteFilter(inputRecord, 'owner');  // Similar to jQuery.extend()
       user.save(function(err, user){
           if(err) next(err);
           user.applyReadFilter('owner'); // Make sure the doc you return does not contain forbidden fields
@@ -60,30 +60,32 @@ Filtering functionality is provided via a schema plugin.
 
 ### Options
 
-  readFilter         - Object mapping filtering profiles to string arrays of allowed fields.  Used when reading
-                       a doc - useful for GET queries that must return only selected fields.
-  writeFilter        - As above, but used when when applied during a PUT or POST.  This filters fields out of a given
-                       object so they will not be written even when specified.
-                       Useful for protected attributes like fb.accessToken.
-  defaultFilterRole  - Profile to use when one is not given, or the given profile does not exist.
-  sanitize           - True to automatically escape HTML in strings.
+- `readFilter` (Object):          Object mapping filtering profiles to string arrays of allowed fields.  Used when reading
+                                 a doc - useful for GET queries that must return only selected fields.
+- `writeFilter` (Object):         As above, but used when when applied during a PUT or POST.  This filters fields out of a given
+                                 object so they will not be written even when specified.
+                                 Useful for protected attributes like fb.accessToken.
+- `defaultFilterRole` (String):   Profile to use when one is not given, or the given profile does not exist.
+- `sanitize` (Boolean):           True to automatically escape HTML in strings.
 
 ### Statics
 
 This plugin adds the following statics to your schema:
-    getReadFilterKeys(filterRole)
-    getWriteFilterKeys(filterRole)
-    applyReadFilter(input, filterRole)
-    applyWriteFilter(input, filterRole)
-    _applyFilter(input, filterKeys)     // private helper
-    _getFilterKeys(type, filterRole)    // private helper
+
+- `getReadFilterKeys(filterRole)`
+- `getWriteFilterKeys(filterRole)`
+- `applyReadFilter(input, filterRole)`
+- `applyWriteFilter(input, filterRole`
+- `_applyFilter(input, filterKeys)     // private helper`
+- `_getFilterKeys(type, filterRole)    // private helper`
 
 ### Methods
 
 This plugin adds the following methods to your schema:
-    extendWithWriteFilter(input, filterRole)
-    applyReadFilter(filterRole)         // convenience method, calls statics.applyReadFilter
-    applyWriteFilter(filterRole)        // convenience method, calls statics.applyWriteFilter
+
+- `extendWithWriteFilter(input, filterRole)`
+- `applyReadFilter(filterRole)         // convenience method, calls statics.applyReadFilter`
+- `applyWriteFilter(filterRole)        // convenience method, calls statics.applyWriteFilter`
 
 ## Denormalize Usage
 
@@ -92,7 +94,7 @@ This plugin has support for, but does not require, the mongoose-filter-plugin in
 
 ### Schema
 
-    var denormalize = require('mongoose-denormalize-plugin');
+    var denormalize = require('mongoose-filter-denormalize').denormalize;
     var ObjectId = mongoose.Schema.ObjectId;
     var UserSchema = new Mongoose.schema({
       name            :   String,
@@ -109,7 +111,7 @@ This plugin has support for, but does not require, the mongoose-filter-plugin in
     // Create a query.
     var opts = {
       refs: ["transactions", "address"],    // Denormalize these refs. If blank, will use defaults
-      filter: "public"};                    // Filter requires use of mongoose-filter-plugin
+      filter: "public";                     // Filter requires use of mongoose-filter-plugin and profiles
       conditions: {
         address: {city : {$eq: "Seattle"}}  // Only return the user if he is in Seattle
       }
@@ -121,15 +123,15 @@ This plugin has support for, but does not require, the mongoose-filter-plugin in
 
 ### Options
 
-  exclude  (String[] or String) - References to never denormalize, even when explicitly asked
-                                  Use this when generating refs programmatically, to prevent unintended leakage.
-  defaults (String[] or String) - References to denormalize when called without options.
-                                  Defaults to all refs (except those in 'exclude').  Useful to define
-                                  this if you have hasMany references that can easily get large.
-  suffix   (String)             - A suffix to add to all denormalized objects. This is not yet supported in Mongoose
-                                  but hopefully will be soon. E.g. a suffix of '_obj' would denormalize the story.comment
-                                  object to story.comment_obj, leaving the id in story.comment. This is necessary
-                                  for compatibility with ExtJS.
+* `exclude`  (String[] or String):  References to never denormalize, even when explicitly asked
+                                   Use this when generating refs programmatically, to prevent unintended leakage.
+* `defaults` (String[] or String):  References to denormalize when called without options.
+                                   Defaults to all refs (except those in 'exclude').  Useful to define
+                                   this if you have hasMany references that can easily get large.
+* `suffix`   (String):              A suffix to add to all denormalized objects. This is not yet supported in Mongoose
+                                   but hopefully will be soon. E.g. a suffix of '_obj' would denormalize the story.comment
+                                   object to story.comment_obj, leaving the id in story.comment. This is necessary
+                                   for compatibility with ExtJS.
 
 ### Notes
 
