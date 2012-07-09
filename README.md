@@ -12,51 +12,55 @@ Filtering functionality is provided via a schema plugin.
 
 ### Schema
 
-    var filter = require('mongoose-filter-denormalize').filter;
-    var ObjectId = mongoose.Schema.ObjectId;
-    var UserSchema = new Mongoose.schema({
-      name            :   String,
-      address         :   String,
-      fb              :  {
-          id              :   Number,
-          accessToken     :   String
-      },
-      writeOnlyField  :   String,
-      readOnlyField   :   String
-    });
-    UserSchema.plugin(filter, {
-      readFilter: {
-          "owner" : ['name', 'address', 'fb.id', 'fb.name', 'readOnlyField'],
-          "public": ['name', 'fb.name']
-      },
-      writeFilter: {
-          "owner" : ['name', 'address', 'fb.id', 'writeOnlyField']
-      },
-      defaultFilterRole: 'nofilter', // 'nofilter' is a built-in filter that does no processing, be careful with this
-      sanitize: true // Escape HTML in strings
-    });
-
+```javascript
+var filter = require('mongoose-filter-denormalize').filter;
+var ObjectId = mongoose.Schema.ObjectId;
+var UserSchema = new Mongoose.schema({
+  name            :   String,
+  address         :   String,
+  fb              :  {
+      id              :   Number,
+      accessToken     :   String
+  },
+  writeOnlyField  :   String,
+  readOnlyField   :   String
+});
+UserSchema.plugin(filter, {
+  readFilter: {
+      "owner" : ['name', 'address', 'fb.id', 'fb.name', 'readOnlyField'],
+      "public": ['name', 'fb.name']
+  },
+  writeFilter: {
+      "owner" : ['name', 'address', 'fb.id', 'writeOnlyField']
+  },
+  defaultFilterRole: 'nofilter', // 'nofilter' is a built-in filter that does no processing, be careful with this
+  sanitize: true // Escape HTML in strings
+});
+```
 
 ### Example Read
 
-    User.findOne({name: 'Foo Bar'}, User.getReadFilterKeys('public')), function(err, user){
-      if(err) next(err);
-      res.send({success: true, users: [user]});
-    });
+```javascript
+User.findOne({name: 'Foo Bar'}, User.getReadFilterKeys('public')), function(err, user){
+  if(err) next(err);
+  res.send({success: true, users: [user]});
+});
+```
 
 ### Example Write
 
-    User.findById(req.params.id, function(err, user){
+```javascript
+User.findById(req.params.id, function(err, user){
+  if(err) next(err);
+  if(user.id !== req.user.id) next(403);
+  user.extendWithWriteFilter(inputRecord, 'owner');  // Similar to jQuery.extend()
+  user.save(function(err, user){
       if(err) next(err);
-      if(user.id !== req.user.id) next(403);
-      user.extendWithWriteFilter(inputRecord, 'owner');  // Similar to jQuery.extend()
-      user.save(function(err, user){
-          if(err) next(err);
-          user.applyReadFilter('owner'); // Make sure the doc you return does not contain forbidden fields
-          res.send({success: true, users: [user]});
-      });
-    });
-
+      user.applyReadFilter('owner'); // Make sure the doc you return does not contain forbidden fields
+      res.send({success: true, users: [user]});
+  });
+});
+```
 
 ### Options
 
@@ -94,32 +98,34 @@ This plugin has support for, but does not require, the mongoose-filter-plugin in
 
 ### Schema
 
-    var denormalize = require('mongoose-filter-denormalize').denormalize;
-    var ObjectId = mongoose.Schema.ObjectId;
-    var UserSchema = new Mongoose.schema({
-      name            :   String,
-      transactions    :   [{type:ObjectId, ref:'Transaction'}],
-      address         :   {type:ObjectId, ref:'Address'},
-      tickets         :   [{type:ObjectId, ref:'Ticket'}],
-      bankaccount     :   {type:ObjectId, ref:'BankAccount'}
-    });
+```javascript
+var denormalize = require('mongoose-filter-denormalize').denormalize;
+var ObjectId = mongoose.Schema.ObjectId;
+var UserSchema = new Mongoose.schema({
+  name            :   String,
+  transactions    :   [{type:ObjectId, ref:'Transaction'}],
+  address         :   {type:ObjectId, ref:'Address'},
+  tickets         :   [{type:ObjectId, ref:'Ticket'}],
+  bankaccount     :   {type:ObjectId, ref:'BankAccount'}
+});
 
-    // Running .denormalize() during a query will by default denormalize the selected defaults.
-    // Excluded collections are never denormalized.
-    UserSchema.plugin(denormalize, {defaults: ['address', 'transactions', 'tickets'], exclude: 'bankaccount'});
+// Running .denormalize() during a query will by default denormalize the selected defaults.
+// Excluded collections are never denormalized.
+UserSchema.plugin(denormalize, {defaults: ['address', 'transactions', 'tickets'], exclude: 'bankaccount'});
 
-    // Create a query.
-    var opts = {
-      refs: ["transactions", "address"],    // Denormalize these refs. If blank, will use defaults
-      filter: "public";                     // Filter requires use of mongoose-filter-plugin and profiles
-      conditions: {
-        address: {city : {$eq: "Seattle"}}  // Only return the user if he is in Seattle
-      }
-    };
-    User.findOne({name: 'Foo Bar'}).denormalize(opts).run(function(err, user){
-      if(err) next(err);
-      res.send({success: true, users: [user]});
-    });
+// Create a query.
+var opts = {
+  refs: ["transactions", "address"],    // Denormalize these refs. If blank, will use defaults
+  filter: "public";                     // Filter requires use of mongoose-filter-plugin and profiles
+  conditions: {
+    address: {city : {$eq: "Seattle"}}  // Only return the user if he is in Seattle
+  }
+};
+User.findOne({name: 'Foo Bar'}).denormalize(opts).run(function(err, user){
+  if(err) next(err);
+  res.send({success: true, users: [user]});
+});
+```
 
 ### Options
 
