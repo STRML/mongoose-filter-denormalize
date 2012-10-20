@@ -1,6 +1,8 @@
 # Mongoose-Filter-Denormalize
 
-Simple filtering and denormalization for Mongoose.
+Simple filtering and denormalization for Mongoose. Useful for REST APIs where you might not want to
+send entire objects down the pipe. Allows you to store sensitive data directly on objects without worrying
+about it being sent to end users.
 
 ## Installation
 
@@ -33,7 +35,8 @@ UserSchema.plugin(filter, {
   writeFilter: {
       "owner" : ['name', 'address', 'fb.id', 'writeOnlyField']
   },
-  defaultFilterRole: 'nofilter', // 'nofilter' is a built-in filter that does no processing, be careful with this
+  // 'nofilter' is a built-in filter that does no processing, be careful with this
+  defaultFilterRole: 'nofilter',
   sanitize: true // Escape HTML in strings
 });
 ```
@@ -69,8 +72,8 @@ User.findById(req.params.id, function(err, user){
 - `writeFilter` (Object):         As above, but used when when applied during a PUT or POST.  This filters fields out of a given
                                  object so they will not be written even when specified.
                                  Useful for protected attributes like fb.accessToken.
-- `defaultFilterRole` (String):   Profile to use when one is not given, or the given profile does not exist.
-- `sanitize` (Boolean):           True to automatically escape HTML in strings.
+- `defaultFilterRole` (String)(default: 'nofilter'):   Profile to use when one is not given, or the given profile does not exist.
+- `sanitize` (Boolean)(default: false):           True to automatically escape HTML in strings.
 
 ### Statics
 
@@ -94,7 +97,7 @@ This plugin adds the following methods to your schema:
 ## Denormalize Usage
 
 Denormalization functionality is provided via a schema plugin.
-This plugin has support for, but does not require, the mongoose-filter-plugin in the same package.
+This plugin has support for, but does not require, the filter.js plugin in the same package.
 
 ### Schema
 
@@ -110,13 +113,20 @@ var UserSchema = new Mongoose.schema({
 });
 
 // Running .denormalize() during a query will by default denormalize the selected defaults.
-// Excluded collections are never denormalized.
-UserSchema.plugin(denormalize, {defaults: ['address', 'transactions', 'tickets'], exclude: 'bankaccount'});
+// Excluded collections are never denormalized, even when asked for.
+// This is useful if passing query params directly to your methods.
+UserSchema.plugin(denormalize, {defaults: ['address', 'transactions', 'tickets'],
+                                exclude: 'bankaccount'});
+```
 
+### Querying
+
+```javascript
 // Create a query.
+// The 'conditions' object allows you to query on denormalized objects!
 var opts = {
   refs: ["transactions", "address"],    // Denormalize these refs. If blank, will use defaults
-  filter: "public";                     // Filter requires use of mongoose-filter-plugin and profiles
+  filter: "public";                     // Filter requires use of filter.js and profiles
   conditions: {
     address: {city : {$eq: "Seattle"}}  // Only return the user if he is in Seattle
   }
@@ -147,7 +157,7 @@ to use defaults.
 
 ## Credits
 
-[mongoose](https://github.com/LearnBoost/mongoose)
+[Mongoose](https://github.com/LearnBoost/mongoose)
 
 
 ## License
