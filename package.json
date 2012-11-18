@@ -1,5 +1,5 @@
 { "name": "mongoose-filter-denormalize",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Simple collection filtering and denormalization.",
   "author": "Samuel Reed <samuel.trace.reed@gmail.com",
   "main": "index",
