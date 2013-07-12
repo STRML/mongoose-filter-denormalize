@@ -45,7 +45,7 @@ UserSchema.plugin(filter, {
 
 ```javascript
 User.findOne({name: 'Foo Bar'}, User.getReadFilterKeys('public')), function(err, user){
-  if(err) next(err);
+  if(err) return next(err);
   res.send({success: true, users: [user]});
 });
 ```
@@ -58,7 +58,7 @@ User.findById(req.params.id, function(err, user){
   if(user.id !== req.user.id) next(403);
   user.extendWithWriteFilter(inputRecord, 'owner');  // Similar to jQuery.extend()
   user.save(function(err, user){
-      if(err) next(err);
+      if(err) return next(err);
       user.applyReadFilter('owner'); // Make sure the doc you return does not contain forbidden fields
       res.send({success: true, users: [user]});
   });
