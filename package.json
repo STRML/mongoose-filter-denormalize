@@ -1,13 +1,14 @@
-{ "name": "mongoose-filter-denormalize",
+{
+  "name": "mongoose-filter-denormalize",
   "version": "0.2.0",
   "description": "Simple collection filtering and denormalization.",
   "author": "Samuel Reed <samuel.trace.reed@gmail.com",
   "main": "index",
   "tags": "mongoose filter plugin",
-  "repository" : "git://github.com/STRML/mongoose-filter-denormalize",
-  "dependencies"    : {
-        "lodash"          : "~2.2.0",
-        "mongoose"        : "~3.6.0",
-        "sanitizer"       : "~0.1.0"
+  "repository": "git://github.com/STRML/mongoose-filter-denormalize",
+  "dependencies": {
+    "lodash": "~2.2.0",
+    "mongoose": "~3.6.0",
+    "sanitizer": "~0.1.0"
   }
 }
