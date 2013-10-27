@@ -47,7 +47,8 @@ UserSchema.plugin(filter, {
   },
   // 'nofilter' is a built-in filter that does no processing, be careful with this
   defaultFilterRole: 'nofilter',
-  sanitize: true // Escape HTML in strings
+  sanitize: true, // Escape HTML in strings
+  compat: true // Enable compatibility for Mongoose versions prior to 3.6 (default false)
 });
 ```
 
@@ -84,6 +85,7 @@ User.findById(req.params.id, function(err, user){
                                  Useful for protected attributes like fb.accessToken.
 - `defaultFilterRole` (String)(default: 'nofilter'):   Profile to use when one is not given, or the given profile does not exist.
 - `sanitize` (Boolean)(default: false):           True to automatically escape HTML in strings.
+- `compat` (Boolean)(default: false):             True to enable compatibility with Mongoose versions prior to 3.6
 
 ### Statics
 
