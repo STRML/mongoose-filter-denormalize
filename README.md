@@ -14,10 +14,6 @@ npm install mongoose-filter-denormalize
 
 `mongoose <= v3.4`
 
-As of v3.6 Mongoose appears to have removed support for sending arrays of keys to `query.populate`
-and `query.select`. As a result this library is not compatible. See #4. Please submit a PR if you have
-time to fix this.
-
 ## Filter Usage
 
 Filtering functionality is provided via a schema plugin.
