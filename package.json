@@ -6,8 +6,8 @@
   "tags": "mongoose filter plugin",
   "repository" : "git://github.com/STRML/mongoose-filter-denormalize",
   "dependencies"    : {
-        "mongoose"        : "~3.0",
-        "sanitizer"       : "~0.0.15",
-        "underscore"      : "~1.3.1"
+        "lodash"          : "~2.2.0",
+        "mongoose"        : "~3.6.0",
+        "sanitizer"       : "~0.1.0"
   }
 }
